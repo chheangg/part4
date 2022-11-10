@@ -81,6 +81,22 @@ describe('total likes', () => {
     const result = listHelper.totalLikes(blogs);
     expect(result).toBe(36);
   })
+
+  test('when list has only one blog, return the author with most like', () => {
+    const result = listHelper.mostLikes(listWithOneBlog);
+    expect(result).toEqual({
+      author: 'Edsger W. Dijkstra',
+      likes: 5,
+    })
+  })
+
+  test('when list has only multiple blog, return the author with most like', () => {
+    const result = listHelper.mostLikes(blogs);
+    expect(result).toEqual({
+      author: "Edsger W. Dijkstra",
+      likes: 17
+    })
+  })
 })
 
 describe('total blogs', () => {
