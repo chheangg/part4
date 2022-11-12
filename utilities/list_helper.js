@@ -1,3 +1,5 @@
+const Blog = require('../models/Blog');
+
 const listWithOneBlog = [
   {
     _id: '5a422aa71b54a676234d17f8',
@@ -107,11 +109,26 @@ const mostLikes = mostAttribute('likes', (authors, blog) => {
   return authors;
 })
 
+const blogsFromDb = async () => {
+  const results = await Blog.find({})
+  const mappedResults = results.map(blog => {
+    return {
+      title: blog.title,
+      author: blog.author,
+      url: blog.url,
+      likes: blog.likes,
+    }
+  })
+
+  return mappedResults;
+}
+
 module.exports = {
   dummy,
   totalLikes,
   mostBlogs,
   mostLikes,
   listWithOneBlog,
-  blogs
+  blogs,
+  blogsFromDb,
 }

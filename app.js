@@ -13,6 +13,12 @@ app.use(express.json())
 
 app.use('/api/blogs', blogApi);
 
+app.use((err, request, response, next) => {
+  if (err.name === 'ValidationError') {
+    response.status(400).end()
+  }
+})
+
 app.listen(config.PORT, () => {
   process.env.NODE_ENV === 'test' ? null : console.log(`Server running on port ${config.PORT}`);
 })
