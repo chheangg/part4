@@ -20,6 +20,11 @@ describe('blog-list tests', () => {
     expect(results.body.length).toBe(listHelper.blogs.length);
     expect(results.body).toContainEqual(listHelper.listWithOneBlog[0]);
   })
+
+  test('Check if ID property exists', async () => {
+    const results = await api.get('/api/blogs').expect(200).expect('Content-Type', /application\/json/);
+    expect(results.body[0].id).toBeDefined()
+  })
 })
 
 afterAll(() => {
