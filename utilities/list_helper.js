@@ -123,6 +123,13 @@ const blogsFromDb = async () => {
   return mappedResults;
 }
 
+const nonExistingId = async () => {
+  const blog = new Blog({title: 'test', author: 'test', url: 'test'});
+  await blog.save()
+  await blog.delete()
+  return blog._id.toString();
+}
+
 module.exports = {
   dummy,
   totalLikes,
@@ -131,4 +138,5 @@ module.exports = {
   listWithOneBlog,
   blogs,
   blogsFromDb,
+  nonExistingId,
 }

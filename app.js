@@ -14,9 +14,12 @@ app.use(express.json())
 app.use('/api/blogs', blogApi);
 
 app.use((err, request, response, next) => {
-  if (err.name === 'ValidationError') {
-    response.status(400).end()
+  if (err.name === 'CastError') {
+    return response.status(400).send({ error: 'malformatted id' });
+  } else if (err.name === 'ValidationError') {
+    return response.status(400).json({ error: error.message });
   }
+  next(err);
 })
 
 app.listen(config.PORT, () => {
