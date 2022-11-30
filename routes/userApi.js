@@ -14,6 +14,11 @@ Router.post('/', async (request, response) => {
 
   const existingUser = await User.findOne({ username: body.username })
 
+  if (body.password.length < 3) {
+    response.status(400).json({
+      error: 'Password is too short, password must be longer than 3 length'
+    })
+  }
   if (existingUser) {
     response.status(400).json({
       error: 'Username must be unique'

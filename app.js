@@ -1,4 +1,5 @@
 const config = require('./utilities/config');
+require('express-async-errors')
 const express = require('express')
 const app = express();
 const cors = require('cors')
@@ -6,8 +7,6 @@ const mongoose = require('mongoose')
 
 const blogApi = require('./routes/blogApi')
 const userApi = require('./routes/userApi')
-
-require('express-async-errors');
 
 mongoose.connect(config.MONGODB_URI)
 
@@ -17,13 +16,16 @@ app.use(express.json())
 app.use('/api/blogs', blogApi);
 app.use('/api/users', userApi)
 
-app.use((err, request, response, next) => {
-  if (err.name === 'CastError') {
+app.use((error, request, response, next) => {
+  console.log(error.message)
+
+  if (error.name === 'CastError') {
     return response.status(400).send({ error: 'malformatted id' });
-  } else if (err.name === 'ValidationError') {
+  } else if (error.name === 'ValidationError') {
     return response.status(400).json({ error: error.message });
   }
-  next(err);
+
+  next(error);
 })
 
 app.listen(config.PORT, () => {
