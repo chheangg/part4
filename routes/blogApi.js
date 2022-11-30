@@ -1,6 +1,5 @@
 const express = require('express');
 const router = express.Router();
-const jwt = require('jsonwebtoken');
 
 const Blog = require('../models/blog');
 const User = require('../models/user')
@@ -11,14 +10,11 @@ router.get('/', async (request, response) => {
 });
 
 router.post('/', async (request, response) => {
-  const body = request.body;
+  const body = request.body
   const tokenUser = request.user
 
-  console.log(tokenUser)
-
-
   if (!tokenUser.id) {
-    response.status(400).json({
+    response.status(401).json({
       error: 'token missing or invalid'
     })
   }
@@ -44,9 +40,7 @@ router.post('/', async (request, response) => {
 router.put('/:id', async (request, response) => {
   const newBlog = request.body
   const updatedBlog = await Blog.findByIdAndUpdate(request.params.id, newBlog, { new: true })
-  console.log(updatedBlog)
-  if (updatedBlog === null) {
-    console.log('hey');
+  if (!updatedBlog) {
     return response.status(404).end()
   }
   response.status(200).json(updatedBlog);
@@ -63,7 +57,7 @@ router.delete('/:id', async (request, response) => {
   }
 
   if (!tokenUser.id) {
-    response.status(404).json({
+    response.status(401).json({
       error: 'token missing or invalid'
     })
   }
@@ -85,7 +79,7 @@ router.delete('/:id', async (request, response) => {
 })
 
 router.get('/:id', async (request, response, next) => {
-  const result = await Blog.findById(request.params.id).populate('user');
+  const result = await Blog.findById(request.params.id).populate('user')
   if (result === null) {
     return response.status(404).end();
   }

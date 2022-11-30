@@ -1,17 +1,33 @@
-const mongoose = require('mongoose');
-const supertest = require('supertest');
-const listHelper = require('./list_helper');
+const mongoose = require('mongoose')
+const supertest = require('supertest')
+const listHelper = require('./list_helper')
 const Blog = require('../models/blog')
+const User = require('../models/user')
 const app = require('../app');
 
 const api = supertest(app);
 
+let token
+let userObj
 beforeAll(async () => {
+  const sampleUser = await listHelper.user()
+  // User setup
+  await User.deleteMany({})
+  const user = new User(sampleUser)
+
+  await user.save()
+
+  // Blog setup
   await Blog.deleteMany({});
-  const blogInstances = listHelper.blogs.map((blog) => new Blog(blog));
+  const blogInstances = listHelper.blogs.map((blog) => new Blog({...blog, user: user._id }));
   const savesArray = blogInstances.map((instance) => instance.save());
   // Hang until all async func has been completed
   await Promise.all(savesArray);
+
+  // Get token
+  const returnedToken = await api.post('/api/users/login').send({ username: sampleUser.username, password: 'password'})
+  token = returnedToken.body.token
+  userObj = await User.findOne({ username: returnedToken.body.username })
 })
 
 describe('When there are some blogs saved', () => {
@@ -27,15 +43,17 @@ describe('When there are some blogs saved', () => {
 })
 
 describe('addition of a new blog', () => {
-  test('Check if POST request is successful', async () => {
+  test('Check if POST request is successful for new blog', async () => {
     const newBlog = {
       title: 'This is a test title',
       author: 'Chheang Ly',
       url: 'http://localhost/',
       likes: 5,
     }
+
     
     await api.post('/api/blogs')
+      .set('Authorization', `bearer ${token}`)
       .send(newBlog)
       .expect(201)
       .expect('Content-Type', /application\/json/)
@@ -54,6 +72,7 @@ describe('addition of a new blog', () => {
     }
 
     await api.post('/api/blogs')
+      .set('Authorization', `bearer ${token}`)
       .send(newBlog)
       .expect(201)
       .expect('Content-Type', /application\/json/);
@@ -77,10 +96,12 @@ describe('addition of a new blog', () => {
     }
 
     await api.post('/api/blogs')
+    .set('Authorization', `bearer ${token}`)
       .send(newBlog_1)
       .expect(400);
 
     await api.post('/api/blogs')
+    .set('Authorization', `bearer ${token}`)
       .send(newBlog_2)
       .expect(400);
   })
@@ -102,7 +123,7 @@ describe('updating a single blog', () => {
     const updatedBlog = await api.put(`/api/blogs/${sampleBlog.id}`).send(newBlog).expect(200).expect('Content-Type', /application\/json/);
     
     const formattedBlog = JSON.parse(JSON.stringify(newBlog));
-    expect(updatedBlog.body).toEqual(formattedBlog);
+    expect(updatedBlog.body).toEqual({...formattedBlog, user: userObj.id});
   })
 
   test('return 404 with a non existing id', async () => {
@@ -134,7 +155,7 @@ describe('updating a single blog', () => {
 
 describe('viewing specific blog', () => {
   test('suceeds with a valid id', async () => {
-    const blogs = await Blog.find({});
+    const blogs = await Blog.find({}).populate('user');
     const sampleBlog = blogs[0];
 
     const response = await api.get(`/api/blogs/${sampleBlog.id}`).expect(200).expect('Content-Type', /application\/json/);

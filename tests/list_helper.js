@@ -1,4 +1,13 @@
 const Blog = require('../models/blog');
+const bcrypt = require('bcrypt')
+
+const user = async () => {
+  return {
+    username: 'chheangg',
+    name: 'Chheang',
+    passwordHash: await bcrypt.hash('password', 10)
+  }
+}
 
 const listWithOneBlog = [
   {
@@ -124,7 +133,7 @@ const blogsFromDb = async () => {
 }
 
 const nonExistingId = async () => {
-  const blog = new Blog({title: 'test', author: 'test', url: 'test'});
+  const blog = new Blog({title: 'test', author: 'test', url: 'test', user: "6387a933b1dd9237a16f8931"});
   await blog.save()
   await blog.delete()
   return blog._id.toString();
@@ -139,4 +148,5 @@ module.exports = {
   blogs,
   blogsFromDb,
   nonExistingId,
+  user,
 }
