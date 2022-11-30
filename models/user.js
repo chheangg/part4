@@ -14,7 +14,13 @@ const userSchema = new Schema({
   passwordHash: {
     type: String,
     required: true
-  }
+  },
+  blogs: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: 'Blog',
+    }
+  ]
 })
 
 userSchema.set('toJSON', {
