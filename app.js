@@ -18,7 +18,7 @@ app.use(express.json())
 
 
 app.use(middleware.tokenExtractor)
-app.use('/api/blogs', blogApi);
+app.use('/api/blogs', middleware.userExtractor, blogApi);
 app.use('/api/users', userApi)
 
 app.use(middleware.errorHandler)

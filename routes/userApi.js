@@ -6,7 +6,7 @@ const jwt = require('jsonwebtoken')
 const User = require('../models/user')
 
 Router.get('/', async (request, response) => {
-  const users = await User.find({}, { passwordHash: 0 }).populate('blogs')
+  const users = await User.find({}, { passwordHash: 0 }).populate('blogs', { user: 0})
   response.json(users)
 })
 

@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 const supertest = require('supertest');
-const listHelper = require('./list_helperlist_helper');
-const Blog = require('../models/Blog')
+const listHelper = require('./list_helper');
+const Blog = require('../models/blog')
 const app = require('../app');
 
 const api = supertest(app);

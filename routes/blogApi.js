@@ -6,24 +6,24 @@ const Blog = require('../models/blog');
 const User = require('../models/user')
 
 router.get('/', async (request, response) => {
-  const blogLists = await Blog.find({}).populate('user');
+  const blogLists = await Blog.find({}).populate('user', { blogs: 0 });
   response.json(blogLists);
 });
 
 router.post('/', async (request, response) => {
   const body = request.body;
-  console.log('REQUEST TOKEN:', request.token)
-  const decodedToken = jwt.decode(request.token, process.env.SECRET);
+  const tokenUser = request.user
 
-  if (!decodedToken.id) {
+  console.log(tokenUser)
+
+
+  if (!tokenUser.id) {
     response.status(400).json({
       error: 'token missing or invalid'
     })
   }
 
-  console.log(request.token)
-
-  const firstUser = await User.findById(decodedToken.id);
+  const firstUser = await User.findById(tokenUser.id);
 
   const blog = new Blog({
     title: body.title,
@@ -50,7 +50,39 @@ router.put('/:id', async (request, response) => {
     return response.status(404).end()
   }
   response.status(200).json(updatedBlog);
-}) 
+})
+
+router.delete('/:id', async (request, response) => {
+  const targetBlog = await Blog.findById(request.params.id)
+  const tokenUser = request.user
+
+  if (!targetBlog) {
+    response.status(404).json({
+      error: 'Blog not found'
+    })
+  }
+
+  if (!tokenUser.id) {
+    response.status(404).json({
+      error: 'token missing or invalid'
+    })
+  }
+
+  const user = await User.findById(tokenUser.id)
+
+  if (targetBlog.user.toString() !== user.id.toString()) {
+    response.status(400).json({
+      error: `Not enough permission to delete blog ${targetBlog.id}`
+    })
+  }
+
+  await targetBlog.delete()
+
+  user.blogs = user.blogs.filter(blog => blog._id.toString() !== targetBlog._id.toString())
+  await user.save()
+
+  response.status(200).json(targetBlog)
+})
 
 router.get('/:id', async (request, response, next) => {
   const result = await Blog.findById(request.params.id).populate('user');

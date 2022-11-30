@@ -3,7 +3,7 @@ Content-Type: application/json
 Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImNoaGVhbmdnIiwiaWQiOiI2Mzg3NmE4MTQ4ZDhjYzU3ZDM5YWU1YzEiLCJpYXQiOjE2Njk4MjQzNDN9.pkM-wbEJ8Zuhz72Uw6DQiAOREhcHVJBkKcjiXbznMX4
 
 {
-  "title": "test",
-  "author": "test",
-  "url": "test"
+  "title": "test2",
+  "author": "test2",
+  "url": "test2"
 }
