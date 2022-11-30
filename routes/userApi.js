@@ -1,6 +1,7 @@
 const express = require('express')
 const Router = express.Router()
 const bcrypt = require('bcrypt')
+const jwt = require('jsonwebtoken')
 
 const User = require('../models/user')
 
@@ -9,7 +10,7 @@ Router.get('/', async (request, response) => {
   response.json(users)
 })
 
-Router.post('/', async (request, response) => {
+Router.post('/register', async (request, response) => {
   const body = request.body
 
   const existingUser = await User.findOne({ username: body.username })
@@ -38,6 +39,30 @@ Router.post('/', async (request, response) => {
   const savedUser = await user.save()
 
   response.status(201).json(savedUser)
+})
+
+Router.post('/login', async (request, response) => {
+  const body = request.body
+
+  const user = await User.findOne({ username: body.username })
+
+  if (!user) {
+    response.status(400).status({
+      error: "Username doesn't exist"
+    })
+  }
+
+  const correctPassword = user === null ? False : await bcrypt.compare(body.password, user.passwordHash)
+  
+  if (!correctPassword) {
+    response.status(400).status({
+      error: "Password is incorrect"
+    })
+  }
+
+  const token = jwt.sign({ username: user.username, id: user._id }, process.env.SECRET)
+
+  response.status(200).send({ token, username: user.username, name: user.name})
 })
 
 module.exports = Router
