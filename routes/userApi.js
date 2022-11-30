@@ -12,7 +12,6 @@ Router.get('/', async (request, response) => {
 
 Router.post('/register', async (request, response) => {
   const body = request.body
-
   const existingUser = await User.findOne({ username: body.username })
 
   if (body.password.length < 3) {
