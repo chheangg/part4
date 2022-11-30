@@ -1,10 +1,13 @@
 const config = require('./utilities/config');
 const express = require('express')
 const app = express();
-require('express-async-errors');
 const cors = require('cors')
 const mongoose = require('mongoose')
+
 const blogApi = require('./routes/blogApi')
+const userApi = require('./routes/userApi')
+
+require('express-async-errors');
 
 mongoose.connect(config.MONGODB_URI)
 
@@ -12,6 +15,7 @@ app.use(cors())
 app.use(express.json())
 
 app.use('/api/blogs', blogApi);
+app.use('/api/users', userApi)
 
 app.use((err, request, response, next) => {
   if (err.name === 'CastError') {
