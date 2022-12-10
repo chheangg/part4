@@ -51,7 +51,7 @@ Router.post('/login', async (request, response) => {
     })
   }
 
-  const correctPassword = user === null ? False : await bcrypt.compare(body.password, user.passwordHash)
+  const correctPassword = user === null ? false : await bcrypt.compare(body.password, user.passwordHash)
   
   if (!correctPassword) {
     response.status(400).status({
