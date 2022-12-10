@@ -19,20 +19,20 @@ router.post('/', async (request, response) => {
     })
   }
 
-  const firstUser = await User.findById(tokenUser.id);
+  const user = await User.findById(tokenUser.id);
 
   const blog = new Blog({
     title: body.title,
     author: body.author,
     url: body.url,
     likes: body.likes ? body.likes : 0,
-    user: firstUser.id,
+    user: user.id,
   })
 
   const result = await blog.save();
 
-  firstUser.blogs = firstUser.blogs.concat(blog)
-  await firstUser.save()
+  user.blogs = user.blogs.concat(blog)
+  await user.save()
 
   response.status(201).json(result);
 });
